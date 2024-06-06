@@ -1,0 +1,26 @@
+definition:
+  id: 'obscsr-medbpot-002'
+  action: 'finetune'
+  llm: 'llama3'
+  get_from: 's3'
+qlora_params: 
+  Rank: 1
+  Alpha: 0.5
+general_ft_params: 
+  batch_size: 32
+  lr: 0.001
+  epochs: 10
+training_material:
+  training_dataset: "name"
+  validation_dataset: "name"
+
+
+
+
+
+  # training_dataset: "https://drive.google.com/file/d/1gzO18oBbhrGJ9IKvmT-M80dDDNU7B1lu/view"
+  # testing_dataset: "https://drive.google.com/file/d/1-DSYR1tfpqpEcAeWs6ZRIZzMX6jhMdvB/view?usp=sharing"
+  # validation_dataset: "https://drive.google.com/file/d/1-J6zswkooQcViJYEOc2q2IKNexwMPHax/view?usp=sharing"
+
+# Sample Drive Download with curl
+# curl -L -o validation.csv https://drive.usercontent.google.com/u/0/uc?id=1-J6zswkooQcViJYEOc2q2IKNexwMPHax&export=download
