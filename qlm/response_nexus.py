@@ -10,11 +10,11 @@ def handle_incoming_request(status: str = None):
     # But if you want to access the data, use request.json
     # data = request.json
     data = request.get_json()
-    id = data.get("id")
-    email = data.get("email")
+    # id = data.get("id")
+    # email = data.get("email")
 
-    return jsonify({"id": id, "email": email, "status": status}), 200
-    
+    # return jsonify({"id": id, "email": email, "status": status}), 200
+    return jsonify(data), 200
     # Just return a success message and status code
     # return "Success!", 200
 
@@ -22,7 +22,7 @@ def pod_async_call():
   print("Your POD is running!")
   
   time.sleep(5)
-#   await asyncio.sleep(5)
+  # await asyncio.sleep(5)
 
   print("Pod async call finished")
   
