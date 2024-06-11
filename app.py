@@ -21,7 +21,8 @@ def handle_finetune_request():
     download_datasets(
         training_dataset = f"{data['training_material']['training_dataset']}",
         validation_dataset=f"{data['training_material']['validation_dataset']}",
-        bucket_name="asadfinetunetesting",
+        # bucket_name="asadfinetunetesting", # For testing
+        bucket_name = "queryloop-storage",
         folder_name=data["definition"]["storage_id"],
         local_dir=data["definition"]["combination_id"]
     )
