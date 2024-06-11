@@ -1,4 +1,5 @@
 import time
+import requests
 from typing import Dict, Any
 from qlm.llama3.llama3_finetuning import loading_model_and_tokenizer, training_model, load_dataset_for_training
 from qlm.llama3.finetuning_variables import LLAMA3TrainingConfig
@@ -22,7 +23,8 @@ class LLAMA3:
             # Define variables
             ## Initalize config
             config = LLAMA3TrainingConfig()
-            print(f"\n\nFROM THE WORKER: Creating instance of LLAMA3TrainingConfig. {config}\n\n")
+            # print(f"\n\nFROM THE WORKER: Creating instance of LLAMA3TrainingConfig. {config}\n\n")
+            LLAMA3.send_log_to_flask(message=f"\n---------------------------------- BEGIN OF TRANSMISSION --------------------------------------\nFROM THE WORKER: Creating instance of LLAMA3TrainingConfig. {config}")
             ## Manually set variables (Not the desired way)
             # config.set_variables(
             #     data_path="medmcq-736_out_of_182k_ready_to_train.json",
@@ -39,7 +41,8 @@ class LLAMA3:
             # )
 
             ## Set variables using values received from the request
-            print(f"\n\nFROM THE WORKER: params: {params}\n\n")
+            # print(f"\n\nFROM THE WORKER: params: {params}\n\n")
+            LLAMA3.send_log_to_flask(message=f"\n\nFROM THE WORKER: params: {params}")
 
             config.set_variables(
                 training_data_path = params["definition"]["combination_id"] + "/training_dataset.json",
@@ -55,10 +58,12 @@ class LLAMA3:
                 save_steps = 150,
                 logging_steps = 1 # Hard Coded
             )
-            print(f"\n\nFROM THE WORKER: config: {config.get_all_variables()}\n\n")
+            # print(f"\n\nFROM THE WORKER: config: {config.get_all_variables()}\n\n")
+            LLAMA3.send_log_to_flask(message=f"\n\nFROM THE WORKER: config: {config.get_all_variables()}")
 
             # Load dataset
-            print(f"FROM THE WORKER: Loading dataset from {config.training_data_path}")
+            # print(f"FROM THE WORKER: Loading dataset from {config.training_data_path}")
+            LLAMA3.send_log_to_flask(message=f"\n\nFROM THE WORKER: Loading dataset from {config.training_data_path}")
             dataset = load_dataset_for_training(data_path=config.training_data_path, batch_size=config.batch_size, save_steps=config.save_steps)
             
             
@@ -66,15 +71,19 @@ class LLAMA3:
             if config.save_steps >= int( len(dataset) / config.batch_size ):
 
                 config.save_steps = int( len(dataset) / config.batch_size ) - 5
-                print(f"FROM THE WORKER: Save steps changed to {config.save_steps}")
+                # print(f"FROM THE WORKER: Save steps changed to {config.save_steps}")
+                LLAMA3.send_log_to_flask(message=f"\n\nFROM THE WORKER: Save steps changed to {config.save_steps}")
 
 
 
             # Load model and tokenizer
+            # print(f"FROM THE WORKER: Loading model and tokenizer from {config.model_dir}")
+            LLAMA3.send_log_to_flask(message=f"\n\nFROM THE WORKER: Loading model and tokenizer from {config.model_dir}")
             model, tokenizer = loading_model_and_tokenizer(model_dir=config.model_dir)
             
             # Training model 
-            print(f"FROM THE WORKER: Starting model training...")
+            # print(f"FROM THE WORKER: Starting model training...")
+            LLAMA3.send_log_to_flask(message=f"\n\nFROM THE WORKER: Starting model training...")
             training_model(
                 out_path=config.out_path,
                 start_epoch=config.start_epoch,
@@ -89,7 +98,26 @@ class LLAMA3:
                 tokenizer=tokenizer,
                 dataset=dataset
             )
-            print(f"FROM THE WORKER: Model training complete!")
+            # print(f"FROM THE WORKER: Model training complete!")
+            LLAMA3.send_log_to_flask(message=f"\n\nFROM THE WORKER: Model training complete!\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx END OF TRANSMISSION xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+
+            # Upload weights to S3
 
         except Exception as e:
-            print(f"FROM THE WORKER: Error setting variables: {e}")
+            # print(f"FROM THE WORKER: Error setting variables: {e}")
+            LLAMA3.send_log_to_flask(message=f"\n\nFROM THE WORKER: Error setting variables: {e}\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx END OF TRANSMISSION xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+
+###################
+    @staticmethod
+    def send_log_to_flask(message: str = None):
+        try:
+            url = "http://localhost:5050/log"  # URL of your Flask server's endpoint
+            payload = {"message": message}
+            headers = {"Content-Type": "application/json"}
+            response = requests.post(url, json=payload, headers=headers)
+            # if response.status_code == 200:
+            #     print("Log sent successfully")
+            # else:
+            #     print(f"Failed to send log: {response.status_code}")
+        except Exception as e:
+            print(f"Failed to send log: {str(e)}")

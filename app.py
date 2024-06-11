@@ -27,7 +27,7 @@ def handle_finetune_request():
     )
     print("Retrieval complete!")
     
-    print(f"data = {data}")
+    # print(f"data = {data}")
 
     # Create the executor and submit the async task
     # Schedule the async call to run in the background

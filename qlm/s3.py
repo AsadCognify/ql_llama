@@ -1,5 +1,6 @@
-import boto3
 import os
+import boto3
+import subprocess
 
 def download_datasets(training_dataset: str, validation_dataset: str, bucket_name: str, folder_name: str, local_dir: str):
     """
@@ -30,20 +31,43 @@ def download_datasets(training_dataset: str, validation_dataset: str, bucket_nam
     download_file_from_s3(training_dataset, folder_name)
     download_file_from_s3(validation_dataset, folder_name)
 
-# Example usage
-if __name__ == "__main__":
-    training_material = {
-        "training_dataset": "training_dataset.json",
-        "validation_dataset": "validation_dataset.json"
-    }
-    bucket_name = "training_bucket"
-    folder_name = "obscsr-medbpot-002"
-    local_directory = "./datasets"
 
-    download_datasets(
-        training_material["training_dataset"],
-        training_material["validation_dataset"],
-        bucket_name,
-        folder_name,
-        local_directory
-    )
+def sync_to_s3(local_dir: str, bucket_name: str, folder_name: str):
+    try:
+        # Construct the command
+        command = [
+            'aws', 's3', 'sync',
+            local_dir,
+            f's3://{bucket_name}',
+            # '--delete'
+        ]
+
+        # Execute the command
+        result = subprocess.run(command, capture_output=True, text=True, check=True)
+
+        print("Sync successful")
+        print(result.stdout)
+
+    except subprocess.CalledProcessError as e:
+        print("Sync failed with error:")
+        print(e.stderr)
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+
+# Example usage
+# if __name__ == "__main__":
+#     training_material = {
+#         "training_dataset": "training_dataset.json",
+#         "validation_dataset": "validation_dataset.json"
+#     }
+#     bucket_name = "training_bucket"
+#     folder_name = "obscsr-medbpot-002"
+#     local_directory = "./datasets"
+
+#     download_datasets(
+#         training_material["training_dataset"],
+#         training_material["validation_dataset"],
+#         bucket_name,
+#         folder_name,
+#         local_directory
+#     )
