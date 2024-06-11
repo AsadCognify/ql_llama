@@ -59,7 +59,7 @@ class LLAMA3:
 
             # Load dataset
             print(f"FROM THE WORKER: Loading dataset from {config.data_path}")
-            dataset = load_dataset_for_training(data_path=config.data_path, batch_size=config.batch_size, save_steps=config.save_steps)
+            dataset = load_dataset_for_training(data_path=config.training_data_path, batch_size=config.batch_size, save_steps=config.save_steps)
             
             
             # Calculate save steps
