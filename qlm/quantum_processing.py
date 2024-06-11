@@ -58,7 +58,7 @@ class LLAMA3:
             print(f"\n\nFROM THE WORKER: config: {config.get_all_variables()}\n\n")
 
             # Load dataset
-            print(f"FROM THE WORKER: Loading dataset from {config.data_path}")
+            print(f"FROM THE WORKER: Loading dataset from {config.training_data_path}")
             dataset = load_dataset_for_training(data_path=config.training_data_path, batch_size=config.batch_size, save_steps=config.save_steps)
             
             
@@ -86,7 +86,8 @@ class LLAMA3:
                 logging_steps=config.logging_steps,
                 save_steps=config.save_steps,
                 model=model,
-                tokenizer=tokenizer
+                tokenizer=tokenizer,
+                dataset=dataset
             )
             print(f"FROM THE WORKER: Model training complete!")
 
