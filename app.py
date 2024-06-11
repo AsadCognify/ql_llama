@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 import concurrent.futures
 from qlm.response_nexus import handle_incoming_request, pod_async_call
 from qlm.quantum_processing import LLAMA3
@@ -17,6 +17,7 @@ def handle_finetune_request():
         local_dir = {data['definition']['combination_id']}"
     )
 
+    print("Retrieving datasets...")
     download_datasets(
         training_dataset = f"{data['training_material']['training_dataset']}",
         validation_dataset=f"{data['training_material']['validation_dataset']}",
@@ -24,14 +25,20 @@ def handle_finetune_request():
         folder_name=data["definition"]["storage_id"],
         local_dir=data["definition"]["combination_id"]
     )
+    print("Retrieval complete!")
     
+    print(f"data = {data}")
+
+    # Create the executor and submit the async task
     # Schedule the async call to run in the background
-    executor.submit(LLAMA3.finetune, data)
+    # futures = executor.submit(LLAMA3.check_thread, data)
+    futures = executor.submit(LLAMA3.finetune, data)
+    print(futures)
     # executor.submit(pod_async_call)
     
     # Return immediately without waiting for the async task to complete
     # return handle_incoming_request()
-    return "Success!\n", 200
+    return jsonify({"Status": "Success!\n"}), 200
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

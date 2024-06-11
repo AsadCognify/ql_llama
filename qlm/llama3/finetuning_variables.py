@@ -3,6 +3,8 @@
 class LLAMA3TrainingConfig:
     def __init__(self):
         self.data_path = None
+        self.training_data_path = None
+        self.validation_data_path = None
         self.model_dir = None
         self.out_path = None
         self.start_epoch = None
@@ -14,8 +16,15 @@ class LLAMA3TrainingConfig:
         self.save_steps = None
         self.logging_steps = None
 
-    def set_variables(self, data_path: str, model_dir: str, out_path: str, start_epoch: int, end_epoch: int, lora_r: int, lora_alpha: float, learning_rate: float, batch_size: int, save_steps: int, logging_steps: int):
-        self.data_path = data_path
+    def set_variables(
+            self, training_data_path: str, validation_data_path: str, model_dir: str, out_path: str, start_epoch: int, end_epoch: int,
+            lora_r: int, lora_alpha: float, learning_rate: float, batch_size: int, save_steps: int, logging_steps: int
+            #data_path: str
+            ):
+        print(f"FROM LLAMA3TrainingConfig: Setting variables")
+        # self.data_path = data_path
+        self.training_data_path = training_data_path
+        self.validation_data_path = validation_data_path
         self.model_dir = model_dir
         self.out_path = out_path
         self.start_epoch = start_epoch
