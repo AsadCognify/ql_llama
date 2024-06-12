@@ -32,6 +32,26 @@ def download_datasets(training_dataset: str, validation_dataset: str, bucket_nam
     download_file_from_s3(validation_dataset, folder_name)
 
 
+def download_from_s3(s3_file_path: str, local_dir: str):
+    """
+    s3: complete s3 file path
+    local_dir: where the downloaded files will be saved
+    """
+    if not os.path.exists(local_dir):
+        os.makedirs(local_dir)
+
+    try:
+        s3_client = boto3.client('s3')
+        bucket_name = "queryloop-storage"
+        
+        s3_client.download_file(bucket_name, s3_file_path, f"{local_dir}/{os.path.basename(s3_file_path)}")
+        
+        # s3_client.get_object(Bucket='examplebucket', Key=s3_path, f"{local_dir}/training_dataset.json")
+        print(f"Downloaded {s3_file_path} to {local_dir}")
+    
+    except Exception as e:
+        print(f"Exception occured: {e}")
+
 def sync_to_s3(local_dir: str, bucket_name: str, folder_name: str):
     try:
         # Construct the command

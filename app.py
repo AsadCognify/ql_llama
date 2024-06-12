@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 import concurrent.futures
 from qlm.response_nexus import handle_incoming_request, pod_async_call
 from qlm.quantum_processing import LLAMA3
-from qlm.s3 import download_datasets
+from qlm.s3 import download_from_s3
 
 app = Flask(__name__)
 executor = concurrent.futures.ThreadPoolExecutor()
@@ -10,22 +10,28 @@ executor = concurrent.futures.ThreadPoolExecutor()
 @app.route("/finetune", methods=["POST"])
 def handle_finetune_request():
     data = request.get_json()
-    print(
-        f"training_dataset = {data['definition']['storage_id']}/{data['training_material']['training_dataset']}\n\
-        validation_dataset = {data['definition']['storage_id']}/{data['training_material']['validation_dataset']}\n\
-        bucket_name = 'asadfinetunetesting'\n\
-        local_dir = {data['definition']['combination_id']}"
-    )
+    print(data)
+    
+    # print(
+    #     f"training_dataset = {data['definition']['storage_id']}/{data['training_material']['training_dataset']}\n\
+    #     validation_dataset = {data['definition']['storage_id']}/{data['training_material']['validation_dataset']}\n\
+    #     bucket_name = 'asadfinetunetesting'\n\
+    #     local_dir = {data['definition']['combination_id']}"
+    # )
 
     print("Retrieving datasets...")
-    download_datasets(
-        training_dataset = f"{data['training_material']['training_dataset']}",
-        validation_dataset=f"{data['training_material']['validation_dataset']}",
-        # bucket_name="asadfinetunetesting", # For testing
-        bucket_name = "queryloop-storage",
-        folder_name=data["definition"]["storage_id"],
-        local_dir=data["definition"]["combination_id"]
-    )
+    # download_datasets(
+    #     training_dataset = f"{data['training_material']['training_dataset']}",
+    #     validation_dataset=f"{data['training_material']['validation_dataset']}",
+    #     # bucket_name="asadfinetunetesting", # For testing
+    #     bucket_name = "queryloop-storage",
+    #     folder_name=data["definition"]["storage_id"],
+    #     local_dir=data["definition"]["combination_id"]
+    # )
+    # Training file download
+    download_from_s3(s3_file_path=data['training_material']['training_dataset'], local_dir=data["definition"]["combination_id"])
+    # Validation file download
+    download_from_s3(s3_file_path=data['training_material']['validation_dataset'], local_dir=data["definition"]["combination_id"])
     print("Retrieval complete!")
     
     # print(f"data = {data}")
