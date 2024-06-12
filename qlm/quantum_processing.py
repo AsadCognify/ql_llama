@@ -1,8 +1,10 @@
+import os
 import time
 import requests
 from typing import Dict, Any
 from qlm.llama3.llama3_finetuning import loading_model_and_tokenizer, training_model, load_dataset_for_training
 from qlm.llama3.finetuning_variables import LLAMA3TrainingConfig
+from qlm.llama3.data_prep import Data_Prep
 
 class LLAMA3:
     def __init__(self) -> None:
@@ -45,8 +47,8 @@ class LLAMA3:
             LLAMA3.send_log_to_flask(message=f"\n\nFROM THE WORKER: params: {params}")
 
             config.set_variables(
-                training_data_path = params["definition"]["combination_id"] + "/training_dataset.json",
-                validation_data_path = params["definition"]["combination_id"] + "/validation_dataset.json",
+                training_data_path = params["definition"]["combination_id"] + os.path.basename(params["definition"]["training_material"]["training_dataset"]),
+                validation_data_path = params["definition"]["combination_id"] + os.path.basename(params["definition"]["training_material"]["validation_dataset"]),
                 model_dir = "/workspace/ql_llama/Meta-Llama-3-8B-Instruct", # Hard Coded 
                 out_path = params["definition"]["combination_id"],
                 start_epoch = 1,
@@ -60,6 +62,13 @@ class LLAMA3:
             )
             # print(f"\n\nFROM THE WORKER: config: {config.get_all_variables()}\n\n")
             LLAMA3.send_log_to_flask(message=f"\n\nFROM THE WORKER: config: {config.get_all_variables()}")
+
+            # Convert CSV To JSON
+            # print(f"FROM THE WORKER: Converting CSV to JSON...")
+            LLAMA3.send_log_to_flask(message=f"\n\nFROM THE WORKER: Converting CSV to JSON...")
+            Data_Prep.llama3_data_preparation(csv_file_path = config.training_data_path, out_file_path = config.out_path)
+
+
 
             # Load dataset
             # print(f"FROM THE WORKER: Loading dataset from {config.training_data_path}")
@@ -121,3 +130,5 @@ class LLAMA3:
             #     print(f"Failed to send log: {response.status_code}")
         except Exception as e:
             print(f"Failed to send log: {str(e)}")
+
+            
