@@ -1,5 +1,16 @@
-from qlm.llama3.inference import LLAMA3
+import gc
+import torch
 from qlm.s3 import sync_from_s3
+from qlm.llama3.inference import LLAMA3
+
+
+def clear_gpu_memory(logger, loaded_models):
+    """Clears GPU memory by deleting loaded models and calling garbage collector."""
+    logger.info("Clearing GPU memory.")
+    for model_key in loaded_models.keys():
+        del loaded_models[model_key]
+    gc.collect()
+    torch.cuda.empty_cache()
 
 
 def generate_prediction_from_llama3(model, tokenizer, query: str, system_prompt: str, max_tokens: int = 512):

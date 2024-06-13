@@ -1,7 +1,7 @@
 import json
 import logging
 from flask import Flask, request, jsonify
-from qlm.quantum_processing import generate_prediction_from_llama3, load_model_and_tokenizer_for_llama3
+from qlm.quantum_processing import generate_prediction_from_llama3, load_model_and_tokenizer_for_llama3, clear_gpu_memory
 
 
 # Basic configuration
@@ -11,78 +11,69 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 loaded_models = {}
 
-## Route to load model to memory
 @app.route("/load_model/llama3", methods=["POST"])
 def load_model_llama3():
     """
     Load a Llama3 model and tokenizer for inference.
-
-    This route handles a POST request to load a Llama3 model and tokenizer for inference. The request body should contain
-    a JSON object with the following keys:
-    - `storage_id`: The ID of the storage location where the model is stored.
-    - `bot_name`: The name of the bot.
-    - `epoch`: The epoch of the model.
-    - `use_base_model` (optional): A boolean indicating whether to load the base model for inference (False) or the
-      finetuned model (True).
-
-    The function calls the `load_model_and_tokenizer_for_llama3` function with the provided parameters to load the model
-    and tokenizer. It then stores the loaded model and tokenizer in the `loaded_models` dictionary using the storage ID
-    and bot name as the key.
-
-    Returns:
-        A string indicating the success of the model loading with the format "Model loaded at {storage_id}.{bot_name}".
     """
+    try:
+        # Clear GPU memory before loading new model
+        clear_gpu_memory(logger=logger, loaded_models=loaded_models)
 
-    user_query = request.get_json()
-    print(user_query)
-    # epoch
-    # storage_id
-    # bot_name
-    # (Optional) use_base_model # finetuned inference (False) or base model inference
+        user_query = request.get_json()
+        logger.debug(f"Received load model request: {user_query}")
 
-    model, tokenizer = load_model_and_tokenizer_for_llama3(
-        storage_id=user_query.get("storage_id"), 
-        bot_name=user_query.get("bot_name"),
-        epoch=user_query.get("epoch"),
-        # load_base_model=user_query.get("use_base_model")
-    )
+        storage_id = user_query.get("storage_id")
+        bot_name = user_query.get("bot_name")
+        epoch = user_query.get("epoch")
+        use_base_model = user_query.get("use_base_model", False)
 
-    loaded_models[ f'{user_query.get("storage_id")}.{user_query.get("bot_name")}' ] = (model, tokenizer)
-
-    return f'Model loaded at {user_query.get("storage_id")}.{user_query.get("bot_name")}'
-
-## Route to run inference on a loaded model
-@app.route("/inference/llama3", methods=["POST"])
-def inference_llama3():
-    user_query = request.get_json()
-
-    print(user_query)
-    # epoch
-    # query
-    # prompt
-    # storage_id
-    # bot_name
-
-    model_name = f'{user_query.get("storage_id")}.{user_query.get("bot_name")}'
-
-    if model_name in loaded_models:
-        model, tokenizer = loaded_models[model_name]
-
-        prediction = generate_prediction_from_llama3(
-            model= model,
-            tokenizer= tokenizer,
-            query=user_query.get("query"),
-            system_prompt=user_query.get("prompt")
+        model, tokenizer = load_model_and_tokenizer_for_llama3(
+            storage_id=storage_id, 
+            bot_name=bot_name,
+            epoch=epoch,
+            load_base_model=use_base_model
         )
 
-        # prediction = None
-        logger.info(f"prediction: {prediction}")
+        model_key = f'{storage_id}.{bot_name}'
+        loaded_models[model_key] = (model, tokenizer)
+        logger.info(f"Model loaded at {model_key}")
 
-        return jsonify({"prediction": prediction.split("assistant\n\n")[1]}), 200
-        # return jsonify(prediction)
+        return jsonify({"message": f"Model loaded at {model_key}"}), 200
+    except Exception as e:
+        logger.error(f"Error loading model: {e}")
+        return jsonify({"error": str(e)}), 500
 
-    else:
-        return f'Model {user_query.get("storage_id")}.{user_query.get("bot_name")} not loaded. Please load the model first.', 400
+@app.route("/inference/llama3", methods=["POST"])
+def inference_llama3():
+    try:
+        user_query = request.get_json()
+        logger.debug(f"Received inference request: {user_query}")
+
+        storage_id = user_query.get("storage_id")
+        bot_name = user_query.get("bot_name")
+        query = user_query.get("query")
+        prompt = user_query.get("prompt")
+
+        model_key = f'{storage_id}.{bot_name}'
+
+        if model_key in loaded_models:
+            model, tokenizer = loaded_models[model_key]
+            prediction = generate_prediction_from_llama3(
+                model=model,
+                tokenizer=tokenizer,
+                query=query,
+                system_prompt=prompt
+            )
+
+            logger.info(f"Prediction generated for {model_key}: {prediction}")
+            return jsonify({"prediction": prediction.split("assistant\n\n")[1]}), 200
+        else:
+            logger.warning(f"Model {model_key} not loaded. Please load the model first.")
+            return jsonify({"error": f"Model {model_key} not loaded. Please load the model first."}), 400
+    except Exception as e:
+        logger.error(f"Error during inference: {e}")
+        return jsonify({"error": str(e)}), 500
 
 
 
