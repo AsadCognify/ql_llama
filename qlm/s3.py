@@ -26,6 +26,7 @@ def download_from_s3(s3_path: str, local_dir: str):
 def sync_from_s3(s3_folder: str, local_dir: str):
     try:
         bucket_name = "queryloop-storage"
+        print(f"bucket_name = {bucket_name}, s3_folder = {s3_folder}")
 
         # Construct the command
         command = [
