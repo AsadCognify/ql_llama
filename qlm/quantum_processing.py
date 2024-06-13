@@ -1,13 +1,21 @@
 import gc
 import torch
+# from memory_profiler import profile
 from qlm.s3 import sync_from_s3
 from qlm.llama3.inference import LLAMA3
 
 
+def clear_memory(logger):
+    """Clears cache GPU memory by ."""
+    logger.info("Clearing cache and intermediate memory.")
+    torch.cuda.empty_cache()
+    gc.collect()
+    torch.cuda.synchronize()
+
 def clear_gpu_memory(logger, loaded_models):
     """Clears GPU memory by deleting loaded models and calling garbage collector."""
     logger.info("Clearing GPU memory.")
-    for model_key in loaded_models.keys():
+    for model_key in list(loaded_models.keys()):
         del loaded_models[model_key]
     gc.collect()
     torch.cuda.empty_cache()

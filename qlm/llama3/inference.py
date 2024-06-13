@@ -54,6 +54,12 @@ class LLAMA3:
             output_tokens = model.generate(**batch, max_new_tokens=max_tokens)
 
         result=tokenizer.decode(output_tokens[0], skip_special_tokens=True)
+        
+        # Clear intermediate tensors
+        del batch
+        del output_tokens
+        torch.cuda.empty_cache()
+        
         return result
 
 

@@ -1,7 +1,7 @@
 import json
 import logging
 from flask import Flask, request, jsonify
-from qlm.quantum_processing import generate_prediction_from_llama3, load_model_and_tokenizer_for_llama3, clear_gpu_memory
+from qlm.quantum_processing import generate_prediction_from_llama3, load_model_and_tokenizer_for_llama3, clear_gpu_memory, clear_memory
 
 
 # Basic configuration
@@ -65,6 +65,9 @@ def inference_llama3():
                 query=query,
                 system_prompt=prompt
             )
+
+            # Clear memory after generation
+            clear_memory(logger=logger)
 
             logger.info(f"Prediction generated for {model_key}: {prediction}")
             return jsonify({"prediction": prediction.split("assistant\n\n")[1]}), 200
