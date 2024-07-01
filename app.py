@@ -78,6 +78,12 @@ def inference_llama3():
         logger.error(f"Error during inference: {e}")
         return jsonify({"error": str(e)}), 500
 
+@app.route('/ping', methods=['GET'])
+def Pong():
+    return {
+        'status': True,
+        'msg': 'PONG'
+    }
 
 
 # Start the flask app
