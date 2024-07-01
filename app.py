@@ -47,6 +47,20 @@ def handle_finetune_request():
     # return handle_incoming_request()
     return jsonify({"Status": "Success!\n"}), 200
 
+@app.route("/ping", methods=["GET"])
+def PONG():
+    return {
+        "status": True,
+        "msg": "Pong"
+    }
+
+@app.route('/test', methods=['POST'])
+def test_data():
+    data = request.get_json()
+    return jsonify(data)
+
+
+    
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
 
