@@ -18,7 +18,7 @@ import pandas as pd
 class LLAMA3:
 
     @staticmethod
-    def load_model_and_tokenizer(model_dir, base_model_dir = "/workspace/ql_llama/Meta-Llama-3-8B-Instruct", epoch=None, load_base_model=False):
+    def load_model_and_tokenizer(model_dir, base_model_dir = "/workspace/meta-llama/Meta-Llama-3-8B-Instruct", epoch=None, load_base_model=False):
 
         if load_base_model:
             model = AutoModelForCausalLM.from_pretrained(
