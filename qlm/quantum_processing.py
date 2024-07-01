@@ -5,7 +5,7 @@ from typing import Dict, Any
 from qlm.llama3.llama3_finetuning import loading_model_and_tokenizer, training_model, load_dataset_for_training
 from qlm.llama3.finetuning_variables import LLAMA3TrainingConfig
 from qlm.llama3.data_prep import Data_Prep
-
+from qlm.s3 import sync_to_s3
 class LLAMA3:
     def __init__(self) -> None:
         pass
@@ -22,6 +22,15 @@ class LLAMA3:
     @staticmethod
     def finetune(params: Dict[str, Any]):
         try:
+
+            # Send finetune completion request to endpoint
+            request_url = f'https://dev.queryloop-ai.com/api/eval_bot/set/finetune/status/{params["definition"]["bot_id"]}/{params["definition"]["combination_id"]}'
+            print(request_url)
+            payload = {"status": "running"}
+            response = requests.post(request_url, json=payload)
+            print(response.json())
+
+            
             # Define variables
             ## Initalize config
             config = LLAMA3TrainingConfig()
@@ -47,9 +56,9 @@ class LLAMA3:
             LLAMA3.send_log_to_flask(message=f"\n\nFROM THE WORKER: params: {params}")
 
             config.set_variables(
-                training_data_path = params["definition"]["combination_id"] + os.path.basename(params["definition"]["training_material"]["training_dataset"]),
-                validation_data_path = params["definition"]["combination_id"] + os.path.basename(params["definition"]["training_material"]["validation_dataset"]),
-                model_dir = "/workspace/ql_llama/Meta-Llama-3-8B-Instruct", # Hard Coded 
+                training_data_path = params["definition"]["combination_id"] + "/" + os.path.basename(params["training_material"]["training_dataset"]),
+                validation_data_path = params["definition"]["combination_id"] + "/" + os.path.basename(params["training_material"]["validation_dataset"]),
+                model_dir = "/workspace/meta-llama/Meta-Llama-3-8B-Instruct", # Hard Coded 
                 out_path = params["definition"]["combination_id"],
                 start_epoch = 1,
                 end_epoch = params["general_ft_params"]["epochs"],
@@ -72,8 +81,8 @@ class LLAMA3:
 
             # Load dataset
             # print(f"FROM THE WORKER: Loading dataset from {config.training_data_path}")
-            LLAMA3.send_log_to_flask(message=f"\n\nFROM THE WORKER: Loading dataset from {config.training_data_path}")
-            dataset = load_dataset_for_training(data_path=config.training_data_path, batch_size=config.batch_size, save_steps=config.save_steps)
+            LLAMA3.send_log_to_flask(message=f"\n\nFROM THE WORKER: Loading dataset from {config.training_data_path.replace('.csv', '.json')}")
+            dataset = load_dataset_for_training(data_path=config.training_data_path.replace(".csv", ".json"), batch_size=config.batch_size, save_steps=config.save_steps)
             
             
             # Calculate save steps
@@ -108,13 +117,27 @@ class LLAMA3:
                 dataset=dataset
             )
             # print(f"FROM THE WORKER: Model training complete!")
-            LLAMA3.send_log_to_flask(message=f"\n\nFROM THE WORKER: Model training complete!\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx END OF TRANSMISSION xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+            LLAMA3.send_log_to_flask(message=f"\n\nFROM THE WORKER: Model training complete!")
 
             # Upload weights to S3
+            LLAMA3.send_log_to_flask(message="\n\nSync with S3")
+            sync_to_s3( local_dir = config.out_path, bucket_name = 'queryloop-storage', folder_name = params["definition"]["storage_id"] + "/" + params["training_material"]["training_dataset"].split("/")[1])
+
+            # Send finetune completion request to endpoint
+            request_url = f'https://dev.queryloop-ai.com/api/eval_bot/set/finetune/status/{params["definition"]["bot_id"]}/{params["definition"]["combination_id"]}'
+            payload = {"status": "completed"}
+            response = requests.post(request_url, json=payload)
+            print(response.json())
+            
+            LLAMA3.send_log_to_flask(message="\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx END OF TRANSMISSION xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
 
         except Exception as e:
             # print(f"FROM THE WORKER: Error setting variables: {e}")
             LLAMA3.send_log_to_flask(message=f"\n\nFROM THE WORKER: Error setting variables: {e}\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx END OF TRANSMISSION xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+            # Send finetune completion request to endpoint
+            request_url = f'https://dev.queryloop-ai.com/api/eval_bot/set/finetune/status/{params["definition"]["bot_id"]}/{params["definition"]["combination_id"]}'
+            payload = {"status": "failed"}
+            response = requests.post(request_url, json=payload)
 
 ###################
     @staticmethod

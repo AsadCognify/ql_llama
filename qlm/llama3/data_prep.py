@@ -31,7 +31,7 @@ class Data_Prep:
         
         ready_to_train = {"version": "0.1.0", 'data':data}
 
-        Data_Prep.json_file_writer(out_file_path, ready_to_train)
+        Data_Prep.json_file_writer(file_path = csv_file_path.split(".")[0] + ".json", data = ready_to_train)
 
 
 

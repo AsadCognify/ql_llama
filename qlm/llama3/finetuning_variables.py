@@ -59,6 +59,8 @@ class LLAMA3TrainingConfig:
     def get_all_variables(self):
         return {
             "data_path": self.data_path,
+            "training_data_path": self.training_data_path,
+            "validation_data_path": self.validation_data_path,
             "model_dir": self.model_dir,
             "out_path": self.out_path,
             "start_epoch": self.start_epoch,

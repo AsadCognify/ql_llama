@@ -54,11 +54,12 @@ def download_from_s3(s3_file_path: str, local_dir: str):
 
 def sync_to_s3(local_dir: str, bucket_name: str, folder_name: str):
     try:
+        print(f"local_dir: {local_dir}, bucket_name: {bucket_name}, folder_name: {folder_name}")
         # Construct the command
         command = [
             'aws', 's3', 'sync',
             local_dir,
-            f's3://{bucket_name}',
+            f's3://{bucket_name}/{folder_name}',
             # '--delete'
         ]
 
