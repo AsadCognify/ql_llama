@@ -1,8 +1,9 @@
-from flask import Flask, request, jsonify
 import concurrent.futures
-from qlm.response_nexus import handle_incoming_request, pod_async_call
-from qlm.quantum_processing import LLAMA3
 from qlm.s3 import download_from_s3
+from flask import Flask, request, jsonify
+from qlm.quantum_processing import LLAMA3
+from functools import partial
+from qlm.response_nexus import handle_incoming_request, pod_async_call, job_callback_fn
 
 app = Flask(__name__)
 executor = concurrent.futures.ThreadPoolExecutor()
@@ -40,6 +41,7 @@ def handle_finetune_request():
     # Schedule the async call to run in the background
     # futures = executor.submit(LLAMA3.check_thread, data)
     futures = executor.submit(LLAMA3.finetune, data)
+    futures.add_done_callback(partial(job_callback_fn,token=data['token']))
     print(futures)
     # executor.submit(pod_async_call)
     

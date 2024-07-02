@@ -1,7 +1,8 @@
-from flask import jsonify, request
-import logging
 import time
+import logging
 import asyncio
+import requests
+from flask import jsonify, request
 
 logger = logging.getLogger('my_custom_logger')
 
@@ -27,6 +28,11 @@ def pod_async_call():
   print("Pod async call finished")
   
   return "Pod is running"
+
+def job_callback_fn(future, token):
+    future.result()
+    notify = requests.post(url='https://cp.queryloop-ai.com/notify', json={'token': token})
+
 
 async def initialize_finetune_data(finetune_combination_list, combination_set, org):
     """
