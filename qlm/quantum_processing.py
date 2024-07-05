@@ -59,7 +59,7 @@ class LLAMA3:
                 training_data_path = params["definition"]["combination_id"] + "/" + os.path.basename(params["training_material"]["training_dataset"]),
                 validation_data_path = params["definition"]["combination_id"] + "/" + os.path.basename(params["training_material"]["validation_dataset"]),
                 model_dir = "/workspace/meta-llama/Meta-Llama-3-8B-Instruct", # Hard Coded 
-                out_path = params["definition"]["combination_id"],
+                out_path = params["definition"]["combination_id"], #/bot/<combination_id>/<model_epoch>
                 start_epoch = 1,
                 end_epoch = params["general_ft_params"]["epochs"],
                 lora_r = params["qlora_params"]["Rank"],

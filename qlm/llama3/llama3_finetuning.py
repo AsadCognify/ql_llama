@@ -32,7 +32,7 @@ def loading_model_and_tokenizer(model_dir):
   return model,tokenizer
 
 
-def training_model(out_path,start_epoch,end_epoch,lora_r,lora_alpha,learning_rate,batch_size,logging_steps,save_steps,model,tokenizer,dataset):
+def training_model(out_path,start_epoch,end_epoch,lora_r,lora_alpha,learning_rate,batch_size,logging_steps,save_steps,model,tokenizer,dataset,val_dataset, combinationList: dict):
 
 
   ################################################################################
@@ -204,6 +204,7 @@ def training_model(out_path,start_epoch,end_epoch,lora_r,lora_alpha,learning_rat
     trainer = SFTTrainer(
         model=model,
         train_dataset=dataset,
+        eval_dataset = val_dataset,
         peft_config=peft_config,
         dataset_text_field="text",
         max_seq_length=max_seq_length,
@@ -212,12 +213,23 @@ def training_model(out_path,start_epoch,end_epoch,lora_r,lora_alpha,learning_rat
         packing=packing,
     )
 
+
+    # {
+    # 'combination_id_1': 'epoch_1',
+    # 'combination_id_2': 'epoch_2',
+    # 'combination_id_3': 'epoch_3',
+    # }
+
+    combination_id = combinationList.keys()[start_epoch-1]
+    os.mkdir(f'{out_path}/{combination_id}')
+
     trainer.train(resume_from_checkpoint=resume_from_checkpoint)
-    peft_model_id=out_path+f'/model_{start_epoch}epoch'
+    peft_model_id=out_path+f'{combination_id}/model_{start_epoch}epoch'
     trainer.model.save_pretrained(peft_model_id)
-    tokenizer.save_pretrained(peft_model_id)
+    # tokenizer.save_pretrained(peft_model_id)
+
     loss_df=pd.DataFrame(trainer.state.log_history)
-    loss_df.to_csv(out_path+f'/loss_{start_epoch}epoch.csv')
+    loss_df.to_csv(out_path+f'{combination_id}/loss_{start_epoch}epoch.csv')
     start_epoch=start_epoch+1
 
 
@@ -230,6 +242,14 @@ def load_dataset_for_training(data_path: str, batch_size: int, save_steps: int):
 
     return dataset
 
+def load_dataset_for_validation(data_path: str, batch_size: int, save_steps: int):
+    ###################
+    #     Dataset     #
+    ###################
+    dataset = load_dataset("json", data_files=data_path, field="data")
+    dataset = dataset['train']
+
+    return dataset
 
 def train(model_dir: str):
     ###########################
