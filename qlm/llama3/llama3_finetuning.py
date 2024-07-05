@@ -32,7 +32,7 @@ def loading_model_and_tokenizer(model_dir):
   return model,tokenizer
 
 
-def training_model(out_path,start_epoch,end_epoch,lora_r,lora_alpha,learning_rate,batch_size,logging_steps,save_steps,model,tokenizer,dataset,val_dataset, combinationList: dict):
+def training_model(out_path,start_epoch,end_epoch,lora_r,lora_alpha,learning_rate,batch_size,logging_steps,save_steps,model,tokenizer,dataset,val_dataset, combinationList: dict=None):
 
 
   ################################################################################
@@ -198,6 +198,8 @@ def training_model(out_path,start_epoch,end_epoch,lora_r,lora_alpha,learning_rat
         group_by_length=group_by_length,
         lr_scheduler_type=lr_scheduler_type,
         report_to=report_to,
+        evaluation_strategy="epoch",
+        # eval_steps=4
     )
 
     # Set supervised fine-tuning parameters
@@ -220,20 +222,23 @@ def training_model(out_path,start_epoch,end_epoch,lora_r,lora_alpha,learning_rat
     # 'combination_id_3': 'epoch_3',
     # }
 
-    combination_id = combinationList.keys()[start_epoch-1]
-    os.mkdir(f'{out_path}/{combination_id}')
+    # combination_id = combinationList.keys()[start_epoch-1]
+    # os.mkdir(f'{out_path}/{combination_id}')
 
+
+    # training_arguments.evaluation_strategy = "epoch"  # or steps, to perform evaluation after each epoch or a certain number of steps
+    
     trainer.train(resume_from_checkpoint=resume_from_checkpoint)
-    peft_model_id=out_path+f'{combination_id}/model_{start_epoch}epoch'
+    peft_model_id=out_path+f'/model_{start_epoch}epoch'
     trainer.model.save_pretrained(peft_model_id)
     # tokenizer.save_pretrained(peft_model_id)
 
     loss_df=pd.DataFrame(trainer.state.log_history)
-    loss_df.to_csv(out_path+f'{combination_id}/loss_{start_epoch}epoch.csv')
+    loss_df.to_csv(out_path+f'/loss_{start_epoch}epoch.csv')
     start_epoch=start_epoch+1
 
 
-def load_dataset_for_training(data_path: str, batch_size: int, save_steps: int):
+def load_dataset_for_training(data_path: str, batch_size: int = None, save_steps: int = None):
     ###################
     #     Dataset     #
     ###################
@@ -242,7 +247,7 @@ def load_dataset_for_training(data_path: str, batch_size: int, save_steps: int):
 
     return dataset
 
-def load_dataset_for_validation(data_path: str, batch_size: int, save_steps: int):
+def load_dataset_for_validation(data_path: str, batch_size: int = None, save_steps: int = None):
     ###################
     #     Dataset     #
     ###################

@@ -8,6 +8,26 @@ from qlm.response_nexus import handle_incoming_request, pod_async_call, job_call
 app = Flask(__name__)
 executor = concurrent.futures.ThreadPoolExecutor()
 
+
+@app.route("finetune/bayesian", methods=["POST"])
+def bayesian():
+    data = request.get_json()
+    print(data)
+    print("Retrieving datasets...")
+     # Training file download
+    download_from_s3(s3_file_path=data['training_material']['training_dataset'], local_dir=data["definition"]["combination_id"])
+    # Validation file download
+    download_from_s3(s3_file_path=data['training_material']['validation_dataset'], local_dir=data["definition"]["combination_id"])
+    print("Retrieval complete!")
+
+    eval_loss = LLAMA3.finetune(data, ft = 'bayesian')
+
+    return jsonify({
+        "Status": "Success!",
+        "eval_loss": eval_loss 
+    }), 200
+    
+
 @app.route("/finetune", methods=["POST"])
 def handle_finetune_request():
     data = request.get_json()
@@ -41,7 +61,7 @@ def handle_finetune_request():
     # Schedule the async call to run in the background
     # futures = executor.submit(LLAMA3.check_thread, data)
     futures = executor.submit(LLAMA3.finetune, data)
-    futures.add_done_callback(partial(job_callback_fn,token=data['token']))
+    ##futures.add_done_callback(partial(job_callback_fn,token=data['token']))
     print(futures)
     # executor.submit(pod_async_call)
     
