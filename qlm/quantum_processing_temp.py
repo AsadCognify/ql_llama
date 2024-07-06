@@ -122,6 +122,8 @@ class LLAMA3:
                 
                 return cleaned_losses.iloc[-1]
             
+            logger.info(f"Cleaning up folder: {config['out_path']}")
+            os.removedirs(config["out_path"])
             logger.info(f"\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx END OF TRANSMISSION xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
         
         except Exception as e:
