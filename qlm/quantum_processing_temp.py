@@ -1,5 +1,6 @@
 import os
 import time
+import shutil
 import requests
 import pandas as pd
 from typing import Dict, Any
@@ -121,13 +122,15 @@ class LLAMA3:
                 cleaned_losses = eval_loss_df['eval_loss'].dropna()
 
                 logger.info(f"Cleaning up folder: {config['out_path']}")
-                os.removedirs(config["out_path"])
+                # os.removedirs(config["out_path"])
+                shutil.rmtree(config["out_path"])
                 logger.info(f"\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx END OF TRANSMISSION xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
                 
                 return cleaned_losses.iloc[-1]
             
             logger.info(f"Cleaning up folder: {config['out_path']}")
-            os.removedirs(config["out_path"])
+            # os.removedirs(config["out_path"])
+            shutil.rmtree(config["out_path"])
             logger.info(f"\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx END OF TRANSMISSION xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
         
         except Exception as e:
@@ -135,3 +138,5 @@ class LLAMA3:
 
             # Send finetune completion request to endpoint
             LLAMA3._update_mongo(status='failed', bot_endpoint=f'{params["definition"]["bot_id"]}/{params["definition"]["combination_id"]}')
+
+            
