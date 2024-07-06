@@ -116,7 +116,7 @@ class LLAMA3:
 
             # return eval loss if bayesian fintuning
             if ft == 'bayesian':
-                path_to_loss_file = config.out_path+f'/loss_{config.end_epoch}epoch.csv'
+                path_to_loss_file = config["out_path"]+f'/loss_{config["end_epoch"]}epoch.csv'
                 eval_loss_df = pd.read_csv(path_to_loss_file)
                 cleaned_losses = eval_loss_df['eval_loss'].dropna()
                 
@@ -125,7 +125,7 @@ class LLAMA3:
             logger.info(f"\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx END OF TRANSMISSION xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
         
         except Exception as e:
-            logger.error(f"Error during finetuning: {e}\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx END OF TRANSMISSION xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+            logger.error(f"Error during finetuning: {e}\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx END OF TRANSMISSION xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", exc_info=True)
 
             # Send finetune completion request to endpoint
             LLAMA3._update_mongo(status='failed', bot_endpoint=f'{params["definition"]["bot_id"]}/{params["definition"]["combination_id"]}')
