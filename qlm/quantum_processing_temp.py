@@ -17,7 +17,7 @@ class LLAMA3:
     @classmethod
     def _update_mongo(cls, status: str, bot_endpoint: str):
         logger.debug(f"Updating mongo status to: {status}")
-        request_url = f'https://dev.queryloop-ai.com/api/eval_bot/set/finetune/status/{bot_endpoint}'
+        request_url = f'https://stage.queryloop-ai.com/api/eval_bot/update/combination/finetune/{bot_endpoint}'
         logger.debug(f"request_url: {request_url}")
         payload = {"status": status} #running #failed #compeleted
         response = requests.post(request_url, json=payload)
@@ -139,4 +139,4 @@ class LLAMA3:
             # Send finetune completion request to endpoint
             LLAMA3._update_mongo(status='failed', bot_endpoint=f'{params["definition"]["bot_id"]}/{params["definition"]["combination_id"]}')
 
-            
+
