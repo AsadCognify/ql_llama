@@ -3,10 +3,12 @@ import time
 import requests
 import pandas as pd
 from typing import Dict, Any
-from qlm.llama3.llama3_finetuning import loading_model_and_tokenizer, training_model, load_dataset_for_training, load_dataset_for_validation
-from qlm.llama3.finetuning_variables import LLAMA3TrainingConfig
-from qlm.llama3.data_prep import Data_Prep
 from qlm.s3 import sync_to_s3
+from qlm.utils.logger import logger
+from qlm.llama3.data_prep import Data_Prep
+from qlm.llama3.finetuning_variables import LLAMA3TrainingConfig
+from qlm.llama3.llama3_finetuning import loading_model_and_tokenizer, training_model, load_dataset_for_training, load_dataset_for_validation
+
 class LLAMA3:
     def __init__(self) -> None:
         pass
