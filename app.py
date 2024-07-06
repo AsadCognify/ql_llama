@@ -10,7 +10,7 @@ app = Flask(__name__)
 executor = concurrent.futures.ThreadPoolExecutor()
 
 
-@app.route("finetune/bayesian", methods=["POST"])
+@app.route("/finetune/bayesian", methods=["POST"])
 def bayesian():
     data = request.get_json()
     print(data)
