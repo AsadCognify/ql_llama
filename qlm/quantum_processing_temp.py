@@ -15,7 +15,7 @@ class LLAMA3:
         pass
 
     @classmethod
-    def _update_mongo(cls, status: str, bot_endpoint: str):
+    def _update_mongo(cls, status: str, bot_endpoint: str, loss: float = None):
         logger.debug(f"Updating mongo status to: {status}")
         request_url = f'https://stage.queryloop-ai.com/api/eval_bot/update/combination/finetune/{bot_endpoint}'
         logger.debug(f"request_url: {request_url}")
@@ -112,8 +112,8 @@ class LLAMA3:
             )
             logger.debug(f"Model training complete!")
 
-            # Update mongo status
-            LLAMA3._update_mongo(status='complete', bot_endpoint=f'{params["definition"]["bot_id"]}/{params["definition"]["combination_id"]}')
+            # Sync with S3 (Skipped)
+            logger.warning(f"Skipped sync with S3")
 
             # return eval loss if bayesian fintuning
             if ft == 'bayesian':
@@ -124,10 +124,17 @@ class LLAMA3:
                 logger.info(f"Cleaning up folder: {config['out_path']}")
                 # os.removedirs(config["out_path"])
                 shutil.rmtree(config["out_path"])
+
+                # Update mongo status
+                LLAMA3._update_mongo(status='complete', loss=cleaned_losses.iloc[-1], bot_endpoint=f'{params["definition"]["bot_id"]}/{params["definition"]["combination_id"]}')
+    
                 logger.info(f"\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx END OF TRANSMISSION xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
                 
                 return cleaned_losses.iloc[-1]
-            
+
+            # Update mongo status
+            LLAMA3._update_mongo(status='complete', bot_endpoint=f'{params["definition"]["bot_id"]}/{params["definition"]["combination_id"]}')
+
             logger.info(f"Cleaning up folder: {config['out_path']}")
             # os.removedirs(config["out_path"])
             shutil.rmtree(config["out_path"])
