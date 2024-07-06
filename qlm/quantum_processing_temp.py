@@ -119,6 +119,10 @@ class LLAMA3:
                 path_to_loss_file = config["out_path"]+f'/loss_{config["end_epoch"]}epoch.csv'
                 eval_loss_df = pd.read_csv(path_to_loss_file)
                 cleaned_losses = eval_loss_df['eval_loss'].dropna()
+
+                logger.info(f"Cleaning up folder: {config['out_path']}")
+                os.removedirs(config["out_path"])
+                logger.info(f"\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx END OF TRANSMISSION xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
                 
                 return cleaned_losses.iloc[-1]
             
