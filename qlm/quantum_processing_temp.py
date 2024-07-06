@@ -120,7 +120,7 @@ class LLAMA3:
                 eval_loss_df = pd.read_csv(path_to_loss_file)
                 cleaned_losses = eval_loss_df['eval_loss'].dropna()
                 
-                return cleaned_losses[-1]
+                return cleaned_losses.iloc[-1]
             
             logger.info(f"\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx END OF TRANSMISSION xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
         
