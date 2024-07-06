@@ -47,8 +47,8 @@ class LLAMA3:
             # Create config dict
             logger.info(f"parms: {params}")
             config = {
-                "training_data_path" : params["definition"]["combination_id"] + "/" + os.path.basename(params["training_material"]["training_dataset"]),
-                "validation_data_path" : params["definition"]["combination_id"] + "/" + os.path.basename(params["training_material"]["validation_dataset"]),
+                "training_data_path" : f"/home/" + params["definition"]["combination_id"] + "/" + os.path.basename(params["training_material"]["training_dataset"]),
+                "validation_data_path" : f"/home/" + params["definition"]["combination_id"] + "/" + os.path.basename(params["training_material"]["validation_dataset"]),
                 "model_dir" : "/workspace/meta-llama/Meta-Llama-3-8B-Instruct", # Hard Coded 
                 "out_path" : f"/home/" + params["definition"]["combination_id"], #/bot/<combination_id>/<model_epoch>
                 "start_epoch" : 1,
