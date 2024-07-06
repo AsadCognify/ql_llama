@@ -42,7 +42,7 @@ class LLAMA3:
 
         try:
             # Update mongo to running status
-            LLAMA3._update_mongo(status='running', bot_endpoint=f"{params["definition"]["bot_id"]}/{params["definition"]["combination_id"]}")
+            LLAMA3._update_mongo(status='running', bot_endpoint=f'{params["definition"]["bot_id"]}/{params["definition"]["combination_id"]}')
 
             # Create config dict
             logger.info(f"parms: {params}")
@@ -72,12 +72,12 @@ class LLAMA3:
             Data_Prep.llama3_data_preparation(csv_file_path = config["validation_data_path"], out_file_path = config["out_path"])
 
             # Load datasets for training and validation
-            logger.debug(f"Loading dataset from {config["training_data_path"].replace('.csv', '.json')}")
+            logger.debug(f"Loading dataset from {config['training_data_path'].replace('.csv', '.json')}")
             training_dataset = load_dataset_for_training(
                 data_path=config["training_data_path"].replace(".csv", ".json")
             )
             
-            logger.debug(f"Loading dataset from {config["validation_data_path"].replace('.csv', '.json')}")
+            logger.debug(f"Loading dataset from {config['validation_data_path'].replace('.csv', '.json')}")
             validation_dataset = load_dataset_for_validation(
                 data_path=config["validation_data_path"].replace(".csv", ".json")
             )
@@ -89,7 +89,7 @@ class LLAMA3:
             
 
             # laod model and tokenizer
-            logger.debug(f"Loading model and tokenizer from {config["model_dir"]}")
+            logger.debug(f"Loading model and tokenizer from {config['model_dir']}")
             model, tokenizer = loading_model_and_tokenizer(model_dir=config["model_dir"])
 
             # start training
@@ -112,7 +112,7 @@ class LLAMA3:
             logger.debug(f"Model training complete!")
 
             # Update mongo status
-            LLAMA3._update_mongo(status='complete', bot_endpoint=f"{params["definition"]["bot_id"]}/{params["definition"]["combination_id"]}")
+            LLAMA3._update_mongo(status='complete', bot_endpoint=f'{params["definition"]["bot_id"]}/{params["definition"]["combination_id"]}')
 
             # return eval loss if bayesian fintuning
             if ft == 'bayesian':
@@ -128,4 +128,4 @@ class LLAMA3:
             logger.error(f"Error during finetuning: {e}\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx END OF TRANSMISSION xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
 
             # Send finetune completion request to endpoint
-            LLAMA3._update_mongo(status='failed', bot_endpoint=f"{params["definition"]["bot_id"]}/{params["definition"]["combination_id"]}")
+            LLAMA3._update_mongo(status='failed', bot_endpoint=f'{params["definition"]["bot_id"]}/{params["definition"]["combination_id"]}')
