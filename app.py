@@ -1,7 +1,8 @@
 import concurrent.futures
 from qlm.s3 import download_from_s3
 from flask import Flask, request, jsonify
-from qlm.quantum_processing import LLAMA3
+# from qlm.quantum_processing import LLAMA3
+from qlm.quantum_processing_temp import LLAMA3
 from functools import partial
 from qlm.response_nexus import handle_incoming_request, pod_async_call, job_callback_fn
 
