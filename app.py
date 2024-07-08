@@ -16,10 +16,8 @@ def bayesian():
     data = request.get_json()
     print(data)
     print("Retrieving datasets...")
-    local_path = f'/home/{data["definition"]["combination_id"]}'
-    logger.debug(f"local path: {local_path}")
-    # Training file download
-    download_from_s3(s3_file_path=data['training_material']['training_dataset'], local_dir=local_path)
+     # Training file download
+    download_from_s3(s3_file_path=data['training_material']['training_dataset'], local_dir=f'/home/{data["definition"]["combination_id"]}')
     # Validation file download
     download_from_s3(s3_file_path=data['training_material']['validation_dataset'], local_dir='/home/'+data["definition"]["combination_id"])
     logger.info("Retrieval complete!")
@@ -54,9 +52,9 @@ def handle_finetune_request():
     #     local_dir=data["definition"]["combination_id"]
     # )
     # Training file download
-    download_from_s3(s3_file_path=data['training_material']['training_dataset'], local_dir=data["definition"]["combination_id"])
+    download_from_s3(s3_file_path=data['training_material']['training_dataset'], local_dir='/home/'+data["definition"]["combination_id"])
     # Validation file download
-    download_from_s3(s3_file_path=data['training_material']['validation_dataset'], local_dir=data["definition"]["combination_id"])
+    download_from_s3(s3_file_path=data['training_material']['validation_dataset'], local_dir='/home/'+data["definition"]["combination_id"])
     print("Retrieval complete!")
     
     # print(f"data = {data}")
