@@ -90,7 +90,7 @@ class LLAMA3:
             
             # modify batch size if necessary
             config["batch_size"] = min(config["batch_size"], len(training_dataset))
-            logger.info(f"batch size: {config["batch_size"]}")
+            logger.info(f"batch size: {config['batch_size']}")
 
             # laod model and tokenizer
             logger.debug(f"Loading model and tokenizer from {config['model_dir']}")
