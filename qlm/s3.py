@@ -1,6 +1,7 @@
 import os
 import boto3
 import subprocess
+from qlm.utils.logger import logger
 
 def download_datasets(training_dataset: str, validation_dataset: str, bucket_name: str, folder_name: str, local_dir: str):
     """
@@ -47,7 +48,7 @@ def download_from_s3(s3_file_path: str, local_dir: str):
         s3_client.download_file(bucket_name, s3_file_path, f"{local_dir}/{os.path.basename(s3_file_path)}")
         
         # s3_client.get_object(Bucket='examplebucket', Key=s3_path, f"{local_dir}/training_dataset.json")
-        print(f"Downloaded {s3_file_path} to {local_dir}")
+        logger.debug(f"Downloaded {s3_file_path} to {local_dir}")
     
     except Exception as e:
         print(f"Exception occured: {e}")
