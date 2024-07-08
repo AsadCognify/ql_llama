@@ -16,8 +16,10 @@ def bayesian():
     data = request.get_json()
     print(data)
     print("Retrieving datasets...")
-     # Training file download
-    download_from_s3(s3_file_path=data['training_material']['training_dataset'], local_dir=f'/home/{data["definition"]["combination_id"]}')
+    local_path = f'/home/{data["definition"]["combination_id"]}'
+    logger.debug(f"local path: {local_path}")
+    # Training file download
+    download_from_s3(s3_file_path=data['training_material']['training_dataset'], local_dir=local_path)
     # Validation file download
     download_from_s3(s3_file_path=data['training_material']['validation_dataset'], local_dir='/home/'+data["definition"]["combination_id"])
     logger.info("Retrieval complete!")
