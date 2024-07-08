@@ -135,8 +135,14 @@ class LLAMA3:
                 
                 return cleaned_losses.iloc[-1]
 
+            # Retrieve loss for grid search
+            path_to_loss_file = config["out_path"]+f'/loss_{config["end_epoch"]}epoch.csv'
+            eval_loss_df = pd.read_csv(path_to_loss_file)
+            cleaned_losses = eval_loss_df['eval_loss'].dropna()
+
+
             # Update mongo status
-            LLAMA3._update_mongo(status='complete', bot_endpoint=f'{params["definition"]["bot_id"]}/{params["definition"]["combination_id"]}')
+            LLAMA3._update_mongo(status='complete', loss=cleaned_losses.iloc[-1], bot_endpoint=f'{params["definition"]["bot_id"]}/{params["definition"]["combination_id"]}')
 
             logger.info(f"Cleaning up folder: {config['out_path']}")
             # os.removedirs(config["out_path"])
