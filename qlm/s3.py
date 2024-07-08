@@ -38,6 +38,7 @@ def download_from_s3(s3_file_path: str, local_dir: str):
     s3: complete s3 file path
     local_dir: where the downloaded files will be saved
     """
+    logger.debug(f"local path: {local_dir}")
     if not os.path.exists(local_dir):
         os.makedirs(local_dir)
 
@@ -45,7 +46,7 @@ def download_from_s3(s3_file_path: str, local_dir: str):
         s3_client = boto3.client('s3')
         bucket_name = "queryloop-storage"
         logger.debug(f"local path: {local_dir}")
-        
+
         s3_client.download_file(bucket_name, s3_file_path, f"{local_dir}/{os.path.basename(s3_file_path)}")
         
         # s3_client.get_object(Bucket='examplebucket', Key=s3_path, f"{local_dir}/training_dataset.json")
