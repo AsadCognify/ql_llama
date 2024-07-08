@@ -92,6 +92,9 @@ class LLAMA3:
             config["batch_size"] = min(config["batch_size"], len(training_dataset))
             logger.info(f"batch size: {config['batch_size']}")
 
+            config['save_steps'] = min(1, config['batch_size'])
+            logger.info(f"save steps: {config['save_steps']}")
+
             # laod model and tokenizer
             logger.debug(f"Loading model and tokenizer from {config['model_dir']}")
             model, tokenizer = loading_model_and_tokenizer(model_dir=config["model_dir"])
