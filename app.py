@@ -23,6 +23,7 @@ def bayesian():
     logger.info("Retrieval complete!")
 
     eval_loss = LLAMA3.finetune(data, ft = 'bayesian')
+    logger.info(f"eval_loss: {eval_loss}")
 
     return jsonify({
         "Status": "Success!",
