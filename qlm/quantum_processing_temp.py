@@ -128,9 +128,9 @@ class LLAMA3:
                 eval_loss_df = pd.read_csv(path_to_loss_file)
                 cleaned_losses = eval_loss_df['eval_loss'].dropna()
 
-                logger.info(f"Cleaning up folder: {config['out_path']} - skipped.")
+                logger.info(f"Cleaning up folder: {config['out_path']}")
                 # os.removedirs(config["out_path"])
-                # shutil.rmtree(config["out_path"])
+                shutil.rmtree(config["out_path"])
 
                 # Update mongo status
                 LLAMA3._update_mongo(status='complete', loss=cleaned_losses.iloc[-1], bot_endpoint=f'{params["definition"]["bot_id"]}/{params["definition"]["combination_id"]}')
