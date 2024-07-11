@@ -139,10 +139,10 @@ class LLAMA3:
 
                 # Removing loaded model from GPU
                 logger.info("Clearing up GPU memory")
-                gc.collect()
-                torch.cuda.empty_cache()
                 del model
                 del tokenizer
+                gc.collect()
+                torch.cuda.empty_cache()
     
                 logger.info(f"\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx END OF TRANSMISSION xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
                 
