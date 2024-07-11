@@ -1,5 +1,7 @@
+import gc
 import os
 import time
+import torch
 import shutil
 import requests
 import pandas as pd
@@ -134,6 +136,11 @@ class LLAMA3:
 
                 # Update mongo status
                 LLAMA3._update_mongo(status='complete', loss=cleaned_losses.iloc[-1], bot_endpoint=f'{params["definition"]["bot_id"]}/{params["definition"]["combination_id"]}')
+
+                # Removing loaded model from GPU
+                logger.info("Clearing up GPU memory")
+                gc.collect()
+                torch.cuda.empty_cache()
     
                 logger.info(f"\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx END OF TRANSMISSION xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
                 
