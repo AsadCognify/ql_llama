@@ -141,6 +141,8 @@ class LLAMA3:
                 logger.info("Clearing up GPU memory")
                 gc.collect()
                 torch.cuda.empty_cache()
+                del model
+                del tokenizer
     
                 logger.info(f"\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx END OF TRANSMISSION xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
                 
