@@ -21,9 +21,9 @@ class LLAMA3:
         logger.debug(f"Updating mongo status to: {status}")
         request_url = f'https://stage.queryloop-ai.com/api/eval_bot/update/combination/finetune/{bot_endpoint}'
         logger.debug(f"request_url: {request_url}")
-        payload = {"status": status} #running #failed #compeleted
+        payload = {"status": status, "loss": loss} #running #failed #compeleted
         response = requests.post(request_url, json=payload)
-        logger.debug(f"response: {response.json()}")
+        logger.debug(f"Mongo Status update: {response.json()}")
 
 
     @classmethod
