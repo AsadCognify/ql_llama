@@ -17,11 +17,11 @@ class LLAMA3:
         pass
 
     @classmethod
-    def _update_mongo(cls, status: str, bot_endpoint: str, loss: float = None):
+    def _update_mongo(cls, status: str, bot_endpoint: str, loss: float = 'N/A'):
         logger.debug(f"Updating mongo status to: {status}")
         request_url = f'https://stage.queryloop-ai.com/api/eval_bot/update/combination/finetune/{bot_endpoint}'
         logger.debug(f"request_url: {request_url}")
-        payload = {"status": status, "loss": loss} #running #failed #compeleted
+        payload = {"status": status, "loss": str(loss)} #running #failed #compeleted
         response = requests.post(request_url, json=payload)
         logger.debug(f"Mongo Status update: {response.json()}")
 
@@ -41,7 +41,7 @@ class LLAMA3:
         return current_save_steps
 
     @staticmethod
-    def finetune(params: Dict[str, Any], ft: str = None):
+    def finetune(params: Dict[str, Any], ft: str = None, bay_iter: int = 0):
 
         try:
             # Update mongo to running status
@@ -98,8 +98,11 @@ class LLAMA3:
             logger.info(f"save steps: {config['save_steps']}")
 
             # laod model and tokenizer
-            logger.debug(f"Loading model and tokenizer from {config['model_dir']}")
-            model, tokenizer = loading_model_and_tokenizer(model_dir=config["model_dir"])
+            if bay_iter == 0:
+                logger.debug(f"Loading model and tokenizer from {config['model_dir']}")
+                model, tokenizer = loading_model_and_tokenizer(model_dir=config["model_dir"])
+            else:
+                logger.debug("Model loading skipped. Reason: Model already loaded")
 
             # start training
             logger.info(f"Starting model training...")

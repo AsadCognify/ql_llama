@@ -6,10 +6,11 @@ from qlm.quantum_processing_temp import LLAMA3
 from functools import partial
 from qlm.response_nexus import handle_incoming_request, pod_async_call, job_callback_fn
 from qlm.utils.logger import logger
+from typing import Final
 
 app = Flask(__name__)
 executor = concurrent.futures.ThreadPoolExecutor()
-
+bay_iter: Final[int] = 0
 
 @app.route("/finetune/bayesian", methods=["POST"])
 def bayesian():
@@ -22,8 +23,10 @@ def bayesian():
     download_from_s3(s3_file_path=data['training_material']['validation_dataset'], local_dir='/home/'+data["definition"]["combination_id"])
     logger.info("Retrieval complete!")
 
-    eval_loss = LLAMA3.finetune(data, ft = 'bayesian')
-    logger.info(f"eval_loss: {eval_loss}")
+    global bay_iter
+    eval_loss = LLAMA3.finetune(data, ft = 'bayesian', bay_iter=bay_iter)
+    bay_iter += 1
+    logger.info(f"eval_loss: {eval_loss}, bayesian iteration: {bay_iter}")
 
     return jsonify({
         "Status": "Success!",
