@@ -134,7 +134,7 @@ class LLAMA3:
 
             # Sync with S3 (Skipped)
             logger.warning(f"Sync with S3 - Skipped")
-            # sync_to_s3( local_dir = config["out_path"], bucket_name = 'queryloop-storage', folder_name = params["definition"]["storage_id"] + "/" + params["definition"]["bot_name"] + "/" + params["definition"]["combination_id"])
+            sync_to_s3( local_dir = config["out_path"], bucket_name = 'queryloop-storage', folder_name = params["definition"]["storage_id"] + "/" + params["definition"]["bot_name"] + "/" + params["definition"]["combination_id"])
 
             # return eval loss if bayesian fintuning
             if ft == 'bayesian':
