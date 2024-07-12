@@ -34,13 +34,18 @@ class LLAMA3:
         Data_Prep.llama3_data_preparation(csv_file_path = dataset_path, out_file_path = out_path)
 
     @classmethod
-    def _modify_save_steps(len_training_dataset: int, batch_size, current_save_steps: int):
+    def _modify_save_steps(cls, len_training_dataset: int, batch_size: int, current_save_steps: int):
         # Calculate save steps
-        if current_save_steps >= int( len_training_dataset / batch_size ):
-            current_save_steps = int( len_training_dataset / batch_size ) - 5
-        logger.info(f"Save steps changed to {current_save_steps}")
+        # if current_save_steps >= int( len_training_dataset / batch_size ):
+        #     current_save_steps = int( len_training_dataset / batch_size ) - 5
+        
+        if len_training_dataset // batch_size == 1:
+            # logger.info(f"Save steps changed to {current_save_steps}")
+            return 1
 
-        return current_save_steps
+        elif len_training_dataset // batch_size > 1:
+            return (len_training_dataset // batch_size) - 1
+        # return current_save_steps
 
     @staticmethod
     def finetune(params: Dict[str, Any], ft: str = None, bay_iter: int = 0):
@@ -96,7 +101,8 @@ class LLAMA3:
             config["batch_size"] = min(config["batch_size"], len(training_dataset))
             logger.info(f"batch size: {config['batch_size']}")
 
-            config['save_steps'] = min(1, config['batch_size'])
+            # config['save_steps'] = min(1, config['batch_size'])
+            config['save_steps'] = LLAMA3._modify_save_steps(len(training_dataset), config["batch_size"], config['save_steps'] )
             logger.info(f"save steps: {config['save_steps']}")
 
             # laod model and tokenizer
