@@ -72,7 +72,8 @@ def inference_llama3():
             clear_memory(logger=logger)
 
             logger.info(f"Prediction generated for {model_key}: {prediction}")
-            return jsonify({"prediction": prediction.split("assistant\n\n")[1]}), 200
+            # return jsonify({"prediction": prediction.split("assistant\n\n")[1]}), 200
+            return jsonify({"prediction": prediction}), 200
         else:
             logger.warning(f"Model {model_key} not loaded. Please load the model first.")
             return jsonify({"error": f"Model {model_key} not loaded. Please load the model first."}), 400
