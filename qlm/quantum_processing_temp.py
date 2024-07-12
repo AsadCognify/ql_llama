@@ -12,6 +12,8 @@ from qlm.llama3.data_prep import Data_Prep
 from qlm.llama3.finetuning_variables import LLAMA3TrainingConfig
 from qlm.llama3.llama3_finetuning import loading_model_and_tokenizer, training_model, load_dataset_for_training, load_dataset_for_validation
 
+model, tokenizer = (None, None)
+
 class LLAMA3:
     def __init__(self) -> None:
         pass
@@ -98,6 +100,7 @@ class LLAMA3:
             logger.info(f"save steps: {config['save_steps']}")
 
             # laod model and tokenizer
+            global model, tokenizer
             if bay_iter == 0:
                 logger.debug(f"Loading model and tokenizer from {config['model_dir']}")
                 model, tokenizer = loading_model_and_tokenizer(model_dir=config["model_dir"])
