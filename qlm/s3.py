@@ -1,6 +1,7 @@
 import os
 import boto3
 import subprocess
+from qlm.utils.logger import logger
 
 def download_from_s3(s3_path: str, local_dir: str):
     """
@@ -26,7 +27,7 @@ def download_from_s3(s3_path: str, local_dir: str):
 def sync_from_s3(s3_folder: str, local_dir: str):
     try:
         bucket_name = "queryloop-storage"
-        print(f"bucket_name = {bucket_name}, s3_folder = {s3_folder}")
+        print(f"bucket_name = {bucket_name}, s3_folder = {s3_folder}, local_dir = {local_dir}")
 
         # Construct the command
         command = [
