@@ -25,12 +25,14 @@ def load_model_llama3():
 
         storage_id = user_query.get("storage_id")
         bot_name = user_query.get("bot_name")
+        combination_id = user_query.get("combination_id")
         epoch = user_query.get("epoch")
         use_base_model = user_query.get("use_base_model", False)
 
         model, tokenizer = load_model_and_tokenizer_for_llama3(
             storage_id=storage_id, 
             bot_name=bot_name,
+            combination_id=combination_id,
             epoch=epoch,
             load_base_model=use_base_model
         )

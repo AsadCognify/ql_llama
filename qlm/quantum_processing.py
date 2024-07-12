@@ -38,11 +38,15 @@ def generate_prediction_from_llama3(model, tokenizer, query: str, system_prompt:
     return prediction
 
 
-def load_model_and_tokenizer_for_llama3(storage_id: str, bot_name: str, epoch: int, load_base_model: bool = False):
+def load_model_and_tokenizer_for_llama3(storage_id: str, bot_name: str, combination_id: str, epoch: int, load_base_model: bool = False):
     
     ## Download weights to local system
-    sync_from_s3(s3_folder=f"{storage_id}/{bot_name}", local_dir=storage_id)
+    sync_from_s3(s3_folder=f"{storage_id}/{bot_name}/{combination_id}", local_dir=f"/home/{storage_id}/{combination_id}")
 
-    model, tokenizer = LLAMA3.load_model_and_tokenizer(model_dir=storage_id, epoch=epoch, load_base_model=load_base_model)
+    model, tokenizer = LLAMA3.load_model_and_tokenizer(
+        model_dir=f"/home/{storage_id}/{combination_id}", 
+        epoch=epoch, 
+        load_base_model=load_base_model
+    )
 
     return model, tokenizer
