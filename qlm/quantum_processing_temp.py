@@ -150,11 +150,11 @@ class LLAMA3:
                 LLAMA3._update_mongo(status='complete', loss=cleaned_losses.iloc[-1], bot_endpoint=f'{params["definition"]["bot_id"]}/{params["definition"]["combination_id"]}')
 
                 # Removing loaded model from GPU
-                # logger.info("Clearing up GPU memory")
-                # del model
-                # del tokenizer
-                # gc.collect()
-                # torch.cuda.empty_cache()
+                logger.info("Clearing up GPU memory")
+                del model
+                del tokenizer
+                gc.collect()
+                torch.cuda.empty_cache()
     
                 logger.info(f"\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx END OF TRANSMISSION xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
                 
@@ -172,6 +172,13 @@ class LLAMA3:
             logger.info(f"Cleaning up folder: {config['out_path']}")
             # os.removedirs(config["out_path"])
             shutil.rmtree(config["out_path"])
+            try:
+                logger.info("Sending termination notification to CP")
+                notify = requests.post(url="https://cp.queryloop-ai.com/notify", json={'token': params['token']})
+                logger.debug(f"{notify.text}")
+            except:
+                logger.error("Unable to notify")
+
             logger.info(f"\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx END OF TRANSMISSION xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
         
         except Exception as e:

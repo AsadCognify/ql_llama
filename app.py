@@ -25,7 +25,7 @@ def bayesian():
 
     global bay_iter
     eval_loss = LLAMA3.finetune(data, ft = 'bayesian', bay_iter=bay_iter)
-    bay_iter += 1
+    # bay_iter += 1 # Reimplemeting model offloading after finetuning completion
     logger.info(f"eval_loss: {eval_loss}, bayesian iteration: {bay_iter}")
 
     return jsonify({
