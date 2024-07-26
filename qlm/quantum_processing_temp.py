@@ -174,7 +174,7 @@ class LLAMA3:
             shutil.rmtree(config["out_path"])
             try:
                 logger.info("Sending termination notification to CP")
-                notify = requests.post(url="https://cp.queryloop-ai.com/notify", json={'token': params['token']})
+                notify = requests.post(url="https://cp.queryloop-ai.com/notify", json={'token': params['token'], 'code': '36'})
                 logger.debug(f"{notify.text}")
             except:
                 logger.error("Unable to notify")
@@ -183,6 +183,9 @@ class LLAMA3:
         
         except Exception as e:
             logger.error(f"Error during finetuning: {e}\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx END OF TRANSMISSION xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", exc_info=True)
+            logger.info("Sending termination notification to CP")
+            notify = requests.post(url="https://cp.queryloop-ai.com/notify", json={'token': params['token'], 'code': '26'})
+            logger.debug(f"{notify.text}")
 
             # Send finetune completion request to endpoint
             LLAMA3._update_mongo(status='failed', bot_endpoint=f'{params["definition"]["bot_id"]}/{params["definition"]["combination_id"]}')
