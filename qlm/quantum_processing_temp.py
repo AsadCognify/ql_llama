@@ -174,9 +174,9 @@ class LLAMA3:
             shutil.rmtree(config["out_path"])
             try:
                 logger.info("Sending termination notification to CP")
-                if testing['state']: # True
+                if not params['testing']['state']: # False
                     notify = requests.post(url="https://cp.queryloop-ai.com/notify", json={'token': params['token'], 'code': '36'})
-                else: # False
+                else: # True
                     requests.post(url=testing['url'], json={'token': params['token'], 'code': '36'})
                 logger.debug(f"{notify.text}")
             except:
@@ -187,7 +187,7 @@ class LLAMA3:
         except Exception as e:
             logger.error(f"Error during finetuning: {e}\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx END OF TRANSMISSION xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", exc_info=True)
             logger.info("Sending termination notification to CP")
-            if testing['state']: # True
+            if not params['testing']['state']: # True
                     notify = requests.post(url="https://cp.queryloop-ai.com/notify", json={'token': params['token'], 'code': '26'})
             else: # False
                 requests.post(url=testing['url'], json={'token': params['token'], 'code': '26'})
