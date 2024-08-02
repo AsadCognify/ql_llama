@@ -36,6 +36,12 @@ def bayesian():
 
 @app.route("/finetune", methods=["POST"])
 def handle_finetune_request():
+    """
+    @param data = {
+        ...
+        testing: {state: True | False, url: str}
+    }
+    """
     data = request.get_json()
     print(data)
     

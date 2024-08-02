@@ -48,7 +48,7 @@ class LLAMA3:
         # return current_save_steps
 
     @staticmethod
-    def finetune(params: Dict[str, Any], ft: str = None, bay_iter: int = 0):
+    def finetune(params: Dict[str, Any], ft: str = None, bay_iter: int = 0, testing: Dict[Dict, str] = {'state': False}):
 
         try:
             # Update mongo to running status
@@ -174,7 +174,10 @@ class LLAMA3:
             shutil.rmtree(config["out_path"])
             try:
                 logger.info("Sending termination notification to CP")
-                notify = requests.post(url="https://cp.queryloop-ai.com/notify", json={'token': params['token'], 'code': '36'})
+                if testing['state']: # True
+                    notify = requests.post(url="https://cp.queryloop-ai.com/notify", json={'token': params['token'], 'code': '36'})
+                else: # False
+                    requests.post(url=testing['url'], json={'token': params['token'], 'code': '36'})
                 logger.debug(f"{notify.text}")
             except:
                 logger.error("Unable to notify")
@@ -184,7 +187,10 @@ class LLAMA3:
         except Exception as e:
             logger.error(f"Error during finetuning: {e}\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx END OF TRANSMISSION xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", exc_info=True)
             logger.info("Sending termination notification to CP")
-            notify = requests.post(url="https://cp.queryloop-ai.com/notify", json={'token': params['token'], 'code': '26'})
+            if testing['state']: # True
+                    notify = requests.post(url="https://cp.queryloop-ai.com/notify", json={'token': params['token'], 'code': '26'})
+            else: # False
+                requests.post(url=testing['url'], json={'token': params['token'], 'code': '26'})
             logger.debug(f"{notify.text}")
 
             # Send finetune completion request to endpoint
