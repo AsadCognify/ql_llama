@@ -177,7 +177,7 @@ class LLAMA3:
                 if not params['testing']['state']: # False
                     notify = requests.post(url="https://cp.queryloop-ai.com/notify", json={'token': params['token'], 'code': '36'})
                 else: # True
-                    requests.post(url=testing['url'], json={'token': params['token'], 'code': '36'})
+                    requests.post(url=f"{testing['url']}/notify", json={'token': params['token'], 'code': '36'})
                 logger.debug(f"{notify.text}")
             except:
                 logger.error("Unable to notify")
