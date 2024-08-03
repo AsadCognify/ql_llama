@@ -173,14 +173,19 @@ class LLAMA3:
             # os.removedirs(config["out_path"])
             shutil.rmtree(config["out_path"])
             try:
-                logger.info("Sending termination notification to CP")
-                if not params['testing']['state']: # False
+                logger.info(f"Sending termination notification to CP\ntesting: {params['testing']}")
+                logger.debug(type(params['testing']['state']))
+                
+                if not params['testing']['state']: # when False
+                    logger.debug("notify: cp")
                     notify = requests.post(url="https://cp.queryloop-ai.com/notify", json={'token': params['token'], 'code': '36'})
                 else: # True
-                    requests.post(url=f"{testing['url']}/notify", json={'token': params['token'], 'code': '36'})
+                    logger.debug(f"notify: {params['testing']['url']}/notify")
+                    notify = requests.post(url=f"{params['testing']['url']}/notify", json={'token': params['token'], 'code': '36'})
                 logger.debug(f"{notify.text}")
-            except:
-                logger.error("Unable to notify")
+            except Exception as e:
+                logger.error(f"Unable to notify: {e}", exc_info=True)
+                logger.info(f"testing state {params['testing']['state']}")
 
             logger.info(f"\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx END OF TRANSMISSION xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
         
@@ -190,7 +195,7 @@ class LLAMA3:
             if not params['testing']['state']: # True
                     notify = requests.post(url="https://cp.queryloop-ai.com/notify", json={'token': params['token'], 'code': '26'})
             else: # False
-                requests.post(url=testing['url'], json={'token': params['token'], 'code': '26'})
+                requests.post(url=f"{params['testing']['url']}/notify", json={'token': params['token'], 'code': '26'})
             logger.debug(f"{notify.text}")
 
             # Send finetune completion request to endpoint
