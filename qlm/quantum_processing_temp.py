@@ -178,10 +178,18 @@ class LLAMA3:
                 
                 if not params['testing']['state']: # when False
                     logger.debug("notify: cp")
-                    notify = requests.post(url="https://cp.queryloop-ai.com/notify", json={'token': params['token'], 'code': '36'})
+                    notify = requests.post(url="https://cp.queryloop-ai.com/notify", json={
+                        'token': params['token'],
+                        'code': '36',
+                        'bot_endpoint': f'{params["definition"]["bot_id"]}/{params["definition"]["combination_id"]}'
+                    })
                 else: # True
                     logger.debug(f"notify: {params['testing']['url']}/notify")
-                    notify = requests.post(url=f"{params['testing']['url']}/notify", json={'token': params['token'], 'code': '36'})
+                    notify = requests.post(url=f"{params['testing']['url']}/notify", json={
+                        'token': params['token'],
+                        'code': '36',
+                        'bot_endpoint': f'{params["definition"]["bot_id"]}/{params["definition"]["combination_id"]}'
+                    })
                 logger.debug(f"{notify.text}")
             except Exception as e:
                 logger.error(f"Unable to notify: {e}", exc_info=True)
@@ -193,9 +201,17 @@ class LLAMA3:
             logger.error(f"Error during finetuning: {e}\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx END OF TRANSMISSION xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", exc_info=True)
             logger.info("Sending termination notification to CP")
             if not params['testing']['state']: # True
-                    notify = requests.post(url="https://cp.queryloop-ai.com/notify", json={'token': params['token'], 'code': '26'})
+                    notify = requests.post(url="https://cp.queryloop-ai.com/notify", json={
+                        'token': params['token'],
+                        'code': '26',
+                        'bot_endpoint': f'{params["definition"]["bot_id"]}/{params["definition"]["combination_id"]}'
+                    })
             else: # False
-                requests.post(url=f"{params['testing']['url']}/notify", json={'token': params['token'], 'code': '26'})
+                requests.post(url=f"{params['testing']['url']}/notify", json={
+                    'token': params['token'],
+                    'code': '26',
+                    'bot_endpoint': f'{params["definition"]["bot_id"]}/{params["definition"]["combination_id"]}'
+                })
             logger.debug(f"{notify.text}")
 
             # Send finetune completion request to endpoint
