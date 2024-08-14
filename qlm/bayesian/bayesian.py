@@ -3,10 +3,10 @@ import requests
 from typing import Dict
 from datetime import datetime
 from bayes_opt import UtilityFunction
-from control_plane.billing import Billing
+# from control_plane.billing import Billing
 from bayes_opt import BayesianOptimization
-from control_plane.utils.qlerrors import QLError
-from control_plane.plane import logger, update_mongo
+# from control_plane.utils.qlerrors import QLError
+# from control_plane.plane import logger, update_mongo
 from qlm.utils.logger import logger
 from qlm.utils.pod_errors import PodError
 # from concurrent.futures import ThreadPoolExecutor
@@ -124,12 +124,14 @@ def bayesian_finetune(data, ip_port:str=None, pod_id:Dict=None):
         if request_terminate.status_code == 200:
             return [optimizer.max, request_terminate.json()['cost']]
         else:
-            raise QLError("Error in pod termination", 5026)
+            # raise QLError("Error in pod termination", 5026)
+            raise PodError("Error in pod termination", 5026)
         
     except Exception as e:
         # print(f"Error in bayesian_finetune: {e}")
         logger.error(f"Error in bayesian finetune: {e}", exc_info=True)
         # return {"status": f"Failed to start finetune because {e}"}
-        raise QLError("Failed Bayesian finetune because {e}", 5016)
+        # raise QLError("Failed Bayesian finetune because {e}", 5016)
+        raise PodError("Failed Bayesian finetune because {e.args[0]}", 5016) from e
     
         # Pod shutdown handled at pod
