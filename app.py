@@ -7,6 +7,8 @@ from functools import partial
 from qlm.response_nexus import handle_incoming_request, pod_async_call, job_callback_fn
 from qlm.utils.logger import logger
 from typing import Final
+from qlm.bayesian.bayesian import bayesian_finetune
+from qlm.utils.pod_errors import PodError
 
 app = Flask(__name__)
 executor = concurrent.futures.ThreadPoolExecutor()
@@ -33,6 +35,11 @@ def bayesian():
         "eval_loss": eval_loss 
     }), 200
     
+@app.route("/v2/finetune/bayesian", methods=["POST"])
+def bayesian_ft_on_pod():
+    data = request.get_json()
+    worker = executor.submit(bayesian_finetune, data)
+    return {"status": "success"}
 
 @app.route("/finetune", methods=["POST"])
 def handle_finetune_request():
