@@ -118,7 +118,7 @@ def bayesian_finetune(data, ip_port:str=None, pod_id:Dict=None):
         try:
             if data['testing']['state'] == True:
                     request_terminate = requests.post(
-                    url=f"{data['testing']['url']}/request/notify",
+                    url=f"{data['testing']['url']}/notify",
                     json={'token': data["token"], 'code': 36, 'bot_endpoint': ""}
                 )
             
