@@ -1,4 +1,4 @@
-import concurrent.futures
+from concurrent.futures import ThreadPoolExecutor
 from qlm.s3 import download_from_s3
 from flask import Flask, request, jsonify
 # from qlm.quantum_processing import LLAMA3
@@ -11,7 +11,8 @@ from qlm.bayesian.bayesian import bayesian_finetune
 from qlm.utils.pod_errors import PodError
 
 app = Flask(__name__)
-executor = concurrent.futures.ThreadPoolExecutor()
+executor = ThreadPoolExecutor(max_workers=1)
+executor_bays = ThreadPoolExecutor(max_workers=1)
 bay_iter: Final[int] = 0
 
 @app.route("/finetune/bayesian", methods=["POST"])
@@ -38,7 +39,7 @@ def bayesian():
 @app.route("/v2/finetune/bayesian", methods=["POST"])
 def bayesian_ft_on_pod():
     data = request.get_json()
-    worker = executor.submit(bayesian_finetune, data)
+    worker = executor_bays.submit(bayesian_finetune, data)
     return {"status": "success"}
 
 @app.route("/finetune", methods=["POST"])
