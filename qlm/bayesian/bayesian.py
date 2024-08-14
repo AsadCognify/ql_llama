@@ -115,17 +115,26 @@ def bayesian_finetune(data, ip_port:str=None, pod_id:Dict=None):
         # Delete biller SQLite object
         # del biller
         # Terminate pod since all the points ran without raising an exception
-        request_terminate = requests.post(
-            # url="http://localhost:8000/request/delete_model",
-            url="https://cp.queryloop-ai.com/request/delete_model",
-            json={
-                'token': data["token"],
-        })
-        if request_terminate.status_code == 200:
-            return [optimizer.max, request_terminate.json()['cost']]
-        else:
-            # raise QLError("Error in pod termination", 5026)
-            raise PodError("Error in pod termination", 5026)
+        try:
+            if data['testing']['state'] == True:
+                    request_terminate = requests.post(
+                    url=f"{data['testing']['url']}/request/notify",
+                    json={'token': data["token"], 'code': 36, 'bot_endpoint': ""}
+                )
+            
+
+        except:
+            request_terminate = requests.post(
+                # url="http://localhost:8000/request/delete_model",
+                url="https://cp.queryloop-ai.com/request/delete_model",
+                json={
+                    'token': data["token"],
+            })
+            if request_terminate.status_code == 200:
+                return [optimizer.max, request_terminate.json()['cost']]
+            else:
+                # raise QLError("Error in pod termination", 5026)
+                raise PodError("Error in pod termination", 5026)
         
     except Exception as e:
         # print(f"Error in bayesian_finetune: {e}")
